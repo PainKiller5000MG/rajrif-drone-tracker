@@ -1,0 +1,12 @@
+__pycache__/
+test_out/
+tracker_gui_settings.json
+
+# NOTE: this deviates from the original public-repo convention (which
+# blanket-ignored all of Old/* except For_ESP32/, since Old/mount_config.json
+# carries a site lat/long and that repo is public). This repo is private and
+# the owner asked for every file needed to run the software, so Old/ source
+# is tracked here - only the generated config file itself stays ignored.
+Old/mount_config.json
+Old/__pycache__/
+Old/__MACOSX/

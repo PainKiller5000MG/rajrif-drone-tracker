@@ -1,0 +1,27 @@
+# Virtual environments - never commit, install fresh (see README)
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Model weights - too large for git (drone_yolov11x.pt is 114MB, GitHub's
+# hard limit is 100MB). Fetch instructions are in each module's README.
+weights/*.pt
+**/weights/*.pt
+
+# Runtime logs / detection output - regenerated on every run, not source
+detections_*.csv
+track_log_*.csv
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.~lock.*
+*.swp
+
+# Zip artifacts from earlier packaging - not source
+*.zip
