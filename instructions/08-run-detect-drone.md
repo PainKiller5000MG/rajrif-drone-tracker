@@ -21,15 +21,13 @@ Prompts for camera device index if `--source` isn't given (see
 
 ## Behavior worth knowing
 
-- **Draws a box for anything above Ultralytics' internal default
-  confidence (0.25)**, not your `--conf-threshold`. `--conf-threshold`
-  (default `0.5`) only gates the **console alert**
-  (`Drone detected, confidence 0.XX`) — you'll visually see weak,
-  sub-threshold detections on screen even when nothing prints to console.
-  This is the one script in the repo where that's true; `detect_and_track.py`
-  passes the threshold straight into the model and never even sees
-  weaker detections.
-- Logs **every** detection (regardless of threshold) to a CSV file in the
+- **As of 2026-08-15, `--conf-threshold` gates everything**: what YOLO
+  returns at all, what gets drawn on screen (green box + `class conf`
+  label), what gets logged, and the console alert. Default is now `0.6`.
+  (Previously this script passed no `conf=` to `model.predict()`, so
+  Ultralytics' internal default of 0.25 silently decided what was drawn/
+  logged, while `--conf-threshold` only gated the console print — fixed.)
+- Logs every detection that clears `--conf-threshold` to a CSV file in the
   same folder, timestamped.
 - The weights-size warning (heavy-model-on-small-GPU check) requires
   typing `y` to continue if it triggers — this is intentional, not a bug
@@ -39,7 +37,7 @@ Prompts for camera device index if `--source` isn't given (see
 
 | Flag | Default | Meaning |
 |---|---|---|
-| `--conf-threshold` | `0.5` | console alert threshold only, see above |
+| `--conf-threshold` | `0.6` | confidence floor for a detection to be returned/drawn/logged/alerted at all |
 | `--max-box-area-frac` | `0.5` | rejects frame-spanning false positives (see `11-troubleshooting.md`'s webcam-face incident) |
 | `--half` / `--no-half` | half on | FP16 inference, requires CUDA |
 | `--source` | prompts | camera index or video file path |

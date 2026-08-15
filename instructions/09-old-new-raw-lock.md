@@ -77,7 +77,7 @@ The trained model, none of the persistence. Every frame independently
 re-decided.
 
 **How it works:**
-1. `model.predict(frame, conf=args.conf_threshold, ...)` — `conf=0.80`
+1. `model.predict(frame, conf=args.conf_threshold, ...)` — `conf=0.60`
    default, so YOLO itself discards weak detections before returning
    results.
 2. Boxes covering more than `--max-box-area-frac` (10% of frame) are
@@ -117,7 +117,7 @@ everything after.
    `yolo_autoacquire.py`) polls at `poll_interval_s=0.12`s (~8Hz),
    decoupled from the camera/control loop so slow inference never blocks
    mount commands.
-2. Each cycle: same two filters as Raw (confidence ≥0.80, box ≤10%),
+2. Each cycle: same two filters as Raw (confidence ≥0.60, box ≤10%),
    largest surviving box is the candidate.
 3. Compared to the **previous** cycle's candidate by IoU. Overlap ≥0.35 →
    streak increments. Below that → streak **decays by one**, not resets to
@@ -171,7 +171,7 @@ panic-stop is the real backstop.
 | | Old | Raw | New | Lock |
 |---|---|---|---|---|
 | Detection model | Old/best.pt (weak) | YOLOv11x, 0.905 mAP50 | none — manual select | YOLOv11x, 0.905 mAP50 |
-| Confidence floor | 0.70 | 0.80 | — | 0.80 |
+| Confidence floor | 0.70 | 0.60 | — | 0.60 |
 | Box-size filter | none | ≤10% of frame | — | ≤10% of frame |
 | Acquisition | auto, every frame | auto, every frame | manual click/drag | auto, ~1s confirm |
 | Persistence/memory | none | none | full identity lock | full identity lock |

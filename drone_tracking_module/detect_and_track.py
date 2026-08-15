@@ -82,8 +82,8 @@ def parse_args():
     p.add_argument("--mode", choices=["raw", "lock"], default="lock",
                     help="Starting follow mode (default: lock, the stable one). "
                          "Press 'm' at runtime to switch live.")
-    p.add_argument("--conf-threshold", type=float, default=0.80,
-                    help="Confidence floor for a detection to be used at all (default 0.80).")
+    p.add_argument("--conf-threshold", type=float, default=0.60,
+                    help="Confidence floor for a detection to be used at all (default 0.60).")
     p.add_argument("--max-box-area-frac", type=float, default=0.10,
                     help="Reject detections covering more than this fraction of the "
                          "frame (default 0.10) - guards against frame-spanning false "

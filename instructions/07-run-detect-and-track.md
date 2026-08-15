@@ -68,7 +68,7 @@ smooth. Not a bug, a known tradeoff of this simpler control scheme.
 | Flag | Default | Meaning |
 |---|---|---|
 | `--mode` | `lock` | starting mode, `lock` or `raw` |
-| `--conf-threshold` | `0.80` | confidence floor for any detection to count |
+| `--conf-threshold` | `0.60` | confidence floor for any detection to count |
 | `--max-box-area-frac` | `0.10` | reject detections covering more than this fraction of frame |
 | `--confirm-frames` | `4` | LOCK mode: consistent cycles before auto-locking |
 | `--port` | `None` | mount serial port; omit to log commands instead of sending them |

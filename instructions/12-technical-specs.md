@@ -24,7 +24,7 @@ GPU (Colab Pro+), PyTorch 2.6.0+cu124.
 
 | Filter | Default | Rationale |
 |---|---|---|
-| Confidence threshold | 0.80 | observed false positives measured 0.25–0.68; real detections 0.85–0.95 |
+| Confidence threshold | 0.60 (2026-08-15, lowered from 0.80 at user request so borderline/distant detections aren't missed) | observed false positives measured 0.25–0.68; real detections 0.85–0.95. **Note: 0.60 sits inside the observed false-positive range (up to 0.68), unlike the old 0.80 default** — if a false lock reappears (e.g. a face), raise this back toward 0.80 |
 | Max box area fraction | 0.10 (10%) | real detections ≤2.6% of frame; false positives measured 35–60% |
 | Confirm cycles (LOCK) | 4 consecutive | ~1s before a detection is trusted enough to originate a lock |
 | Detector poll interval | 0.12s (~8Hz) | decoupled from camera/control loop |

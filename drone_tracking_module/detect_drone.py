@@ -32,8 +32,9 @@ def parse_args():
     p.add_argument("--source", default=None,
                    help="Camera device index (e.g. 0, 1) or a video file path. "
                         "If omitted, you'll be prompted to confirm the device index.")
-    p.add_argument("--conf-threshold", type=float, default=0.5,
-                   help="Confidence threshold for the console detection alert (default: 0.5).")
+    p.add_argument("--conf-threshold", type=float, default=0.6,
+                   help="Confidence threshold: gates which detections YOLO returns at all, "
+                        "what gets drawn/logged, and the console alert (default: 0.6).")
     p.add_argument("--max-box-area-frac", type=float, default=0.5,
                    help="Reject detections whose box covers more than this fraction of the "
                         "frame area (default: 0.5). Guards against frame-spanning false "
@@ -203,7 +204,8 @@ def main():
                 break
             frame_count += 1
 
-            results = model.predict(frame, half=use_half, device=device, verbose=False)
+            results = model.predict(frame, conf=args.conf_threshold, half=use_half,
+                                     device=device, verbose=False)
             result = results[0]
 
             frame_h, frame_w = frame.shape[:2]

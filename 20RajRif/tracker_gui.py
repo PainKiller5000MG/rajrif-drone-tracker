@@ -113,7 +113,7 @@ def run_tracker(cfg, stop_event, ui, log):
             from yolo_autoacquire import AutoAcquireDetector
             detector = AutoAcquireDetector(
                 cfg.get("auto_acquire_weights", ""),
-                conf_thresh=cfg.get("auto_acquire_conf", 0.80),
+                conf_thresh=cfg.get("auto_acquire_conf", 0.60),
                 max_box_area_frac=cfg.get("auto_acquire_max_area_frac", 0.10),
                 confirm_frames=cfg.get("auto_acquire_confirm_frames", 5),
                 log=log)
@@ -539,7 +539,7 @@ class TrackerGUI:
         ttk.Button(auto, text="Browse...", command=browse_weights).grid(
             row=1, column=3, sticky="w", **pad)
 
-        self.auto_acquire_conf_var = tk.DoubleVar(value=0.80)
+        self.auto_acquire_conf_var = tk.DoubleVar(value=0.60)
         self.auto_acquire_max_area_var = tk.DoubleVar(value=0.10)
         self.auto_acquire_confirm_var = tk.IntVar(value=4)
         num(auto, "Confidence floor:", self.auto_acquire_conf_var, 2, 0)

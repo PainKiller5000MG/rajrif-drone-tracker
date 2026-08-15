@@ -68,7 +68,7 @@ class AutoAcquireDetector:
     eat into the mount's 5Hz keepalive cadence.
     """
 
-    def __init__(self, weights_path, conf_thresh=0.80, max_box_area_frac=0.10,
+    def __init__(self, weights_path, conf_thresh=0.60, max_box_area_frac=0.10,
                  confirm_frames=4, log=None, poll_interval_s=0.12, iou_min=0.35):
         self.weights_path = weights_path
         self.conf_thresh = conf_thresh
