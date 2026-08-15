@@ -39,6 +39,8 @@
 // sketch, above the class definition, so Axis has to be known before them.
 class Axis;
 
+#include <esp_idf_version.h>
+
 static const char *VERSION = "RAJRIF-MOUNT 2.0 (arduino)";
 
 // 20 kHz is inaudible but plenty of cheap BTS7960 modules cannot switch that
@@ -55,35 +57,45 @@ static const uint32_t LOOP_MS = 2;        // 0 -> full in ~30 ms
 static const uint8_t LED_PIN = 2;
 
 // ---- PWM helpers: the ledc API changed in ESP32 core 3.x ----
+//
+// Was gated on ESP_ARDUINO_VERSION_MAJOR, which is not reliably defined on
+// every board package/IDE combination (seen undefined on a core that was
+// unambiguously 3.x - it has no ledcSetup/ledcAttachPin/ledcWrite(ch,...) at
+// all, yet the guard still took the pre-3.x branch and failed to compile).
+// ESP_IDF_VERSION_MAJOR comes from esp_idf_version.h, which every arduino-esp32
+// release includes unconditionally, and tracks the same API split: core 3.x
+// is built on IDF 5.x, core 2.x on IDF 4.x.
+#if ESP_IDF_VERSION_MAJOR >= 5
 static inline void pwmAttach(uint8_t pin, uint8_t ch, uint32_t freq) {
-#if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
   (void)ch;
   ledcAttach(pin, freq, PWM_BITS);
-#else
-  ledcSetup(ch, freq, PWM_BITS);
-  ledcAttachPin(pin, ch);
-#endif
 }
 
 static inline void pwmDetach(uint8_t pin, uint8_t ch) {
-#if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
   (void)ch;
   ledcDetach(pin);
-#else
-  (void)ch;
-  ledcDetachPin(pin);
-#endif
 }
 
 static inline void pwmWrite(uint8_t pin, uint8_t ch, uint32_t duty) {
-#if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
   (void)ch;
   ledcWrite(pin, duty);
+}
 #else
+static inline void pwmAttach(uint8_t pin, uint8_t ch, uint32_t freq) {
+  ledcSetup(ch, freq, PWM_BITS);
+  ledcAttachPin(pin, ch);
+}
+
+static inline void pwmDetach(uint8_t pin, uint8_t ch) {
+  (void)ch;
+  ledcDetachPin(pin);
+}
+
+static inline void pwmWrite(uint8_t pin, uint8_t ch, uint32_t duty) {
   (void)pin;
   ledcWrite(ch, duty);
-#endif
 }
+#endif
 
 // One BTS7960 half-bridge pair driven as a signed, ramped speed.
 class Axis {
