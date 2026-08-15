@@ -3,6 +3,10 @@
 Pan/tilt drone detection, tracking, and turret control for a DC-motor mount,
 built for 15 RAJRIF & 222 FD WKSP. Private repository.
 
+**Start here: [`instructions/`](instructions/README.md)** — full setup,
+install, run, and troubleshooting docs, in order, from a bare machine to a
+working hardware-connected tracker.
+
 ## Layout
 
 ```
@@ -32,7 +36,7 @@ works fine:
 ```
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-python3 -m pip install ultralytics torch "numpy<2" opencv-contrib-python pyserial tkintermapview numpy
+python3 -m pip install ultralytics torch "numpy<2" opencv-contrib-python pyserial tkintermapview
 ```
 
 **Model weights are not in this repo** (114MB, exceeds GitHub's 100MB
@@ -51,9 +55,9 @@ cp drone_detection_module/weights/drone_yolov11x.pt drone_tracking_module/weight
 export QT_QPA_PLATFORM=xcb
 ```
 
-Full setup/run instructions for the follow-and-track module are in
-`drone_tracking_module/README.md`. For the tracker GUI and operator
-station, see `20RajRif/README.md` and `20RajRif/CLAUDE.md`.
+Full setup/run instructions for every module are in
+[`instructions/`](instructions/README.md). For engineering detail on the
+tracker itself, see `20RajRif/README.md` and `20RajRif/CLAUDE.md`.
 
 ## Safety-relevant code
 
