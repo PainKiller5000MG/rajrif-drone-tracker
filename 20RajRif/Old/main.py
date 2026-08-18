@@ -79,8 +79,8 @@ COAST_ZONE_CAP = 40     # aiming at a prediction: creep, do not slew
 AUTO_ACQUIRE_WEIGHTS = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
     "drone_detection_module", "weights", "drone_yolov11x.pt")
-AUTO_ACQUIRE_CONF = 0.60
-AUTO_ACQUIRE_MAX_AREA_FRAC = 0.10
+AUTO_ACQUIRE_CONF = 0.01  # effectively unfiltered; 0.0 itself is refused by Ultralytics
+AUTO_ACQUIRE_MAX_AREA_FRAC = 1.0  # disabled
 AUTO_ACQUIRE_CONFIRM_FRAMES = 4
 
 STATE_COLORS = {"lock": (0, 255, 0), "coast": (0, 210, 255),

@@ -68,8 +68,8 @@ smooth. Not a bug, a known tradeoff of this simpler control scheme.
 | Flag | Default | Meaning |
 |---|---|---|
 | `--mode` | `lock` | starting mode, `lock` or `raw` |
-| `--conf-threshold` | `0.60` | confidence floor for any detection to count |
-| `--max-box-area-frac` | `0.10` | reject detections covering more than this fraction of frame |
+| `--conf-threshold` | `0.01` (2026-08-16, thresholds removed at user request — see warning below) | confidence floor for any detection to count |
+| `--max-box-area-frac` | `1.0` (disabled) | reject detections covering more than this fraction of frame |
 | `--confirm-frames` | `4` | LOCK mode: consistent cycles before auto-locking |
 | `--port` | `None` | mount serial port; omit to log commands instead of sending them |
 | `--mount-type` | `ESP32 DC (BTS7960)` | or `Stepper (x=/y=)` |
@@ -77,6 +77,19 @@ smooth. Not a bug, a known tradeoff of this simpler control scheme.
 | `--no-half` | off | disable FP16 — use if hitting GPU memory errors |
 
 Full mode explanation: [Old vs New vs Raw vs Lock](09-old-new-raw-lock.md).
+
+**WARNING — confidence and box-size filters are effectively disabled by
+default as of 2026-08-16**, at explicit user request, understanding the
+tradeoff. This means LOCK mode's auto-acquire will originate a lock on
+*any* detection YOLO returns at all — clouds, birds, background noise —
+and if AUTO FIRE is armed, that lock is exactly as fire-eligible as a real
+one (see `10-fire-control-safety.md`). The `--confirm-frames` /
+IoU-consistency streak logic still applies (unchanged, still 4 cycles
+default) as the only remaining gate against a single noisy frame
+originating a lock — it is not a confidence filter and does not protect
+against a *consistently* misdetected non-drone. If false locks become a
+problem, pass `--conf-threshold 0.5` (or higher) and `--max-box-area-frac
+0.1` explicitly on the command line to restore filtering.
 Fire control detail: [Fire control and safety](10-fire-control-safety.md).
 
 ## Verify before trusting this

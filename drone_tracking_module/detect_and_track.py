@@ -82,12 +82,16 @@ def parse_args():
     p.add_argument("--mode", choices=["raw", "lock"], default="lock",
                     help="Starting follow mode (default: lock, the stable one). "
                          "Press 'm' at runtime to switch live.")
-    p.add_argument("--conf-threshold", type=float, default=0.60,
-                    help="Confidence floor for a detection to be used at all (default 0.60).")
-    p.add_argument("--max-box-area-frac", type=float, default=0.10,
+    p.add_argument("--conf-threshold", type=float, default=0.01,
+                    help="Confidence floor for a detection to be used at all (default 0.01 - "
+                         "effectively unfiltered; 0.0 itself is refused by Ultralytics). "
+                         "WARNING: this feeds auto-acquire/LOCK-mode targeting and, if "
+                         "AUTO FIRE is armed, fire eligibility - at this setting expect "
+                         "false locks. See instructions/10-fire-control-safety.md.")
+    p.add_argument("--max-box-area-frac", type=float, default=1.0,
                     help="Reject detections covering more than this fraction of the "
-                         "frame (default 0.10) - guards against frame-spanning false "
-                         "positives in both modes.")
+                         "frame (default 1.0 - disabled). Set below 1.0 to guard "
+                         "against frame-spanning false positives in both modes.")
     p.add_argument("--confirm-frames", type=int, default=4,
                     help="LOCK mode only: consecutive consistent detector cycles "
                          "needed before YOLO originates a fresh lock (default 5).")

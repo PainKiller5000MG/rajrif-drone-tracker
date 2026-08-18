@@ -32,13 +32,16 @@ def parse_args():
     p.add_argument("--source", default=None,
                    help="Camera device index (e.g. 0, 1) or a video file path. "
                         "If omitted, you'll be prompted to confirm the device index.")
-    p.add_argument("--conf-threshold", type=float, default=0.6,
+    p.add_argument("--conf-threshold", type=float, default=0.01,
                    help="Confidence threshold: gates which detections YOLO returns at all, "
-                        "what gets drawn/logged, and the console alert (default: 0.6).")
-    p.add_argument("--max-box-area-frac", type=float, default=0.5,
+                        "what gets drawn/logged, and the console alert (default: 0.01 - "
+                        "effectively unfiltered; 0.0 itself is refused by Ultralytics). "
+                        "WARNING: at this setting expect frequent false positives (see "
+                        "instructions/11-troubleshooting.md).")
+    p.add_argument("--max-box-area-frac", type=float, default=1.0,
                    help="Reject detections whose box covers more than this fraction of the "
-                        "frame area (default: 0.5). Guards against frame-spanning false "
-                        "positives from noisy/low-res feeds. Set to 1.0 to disable.")
+                        "frame area (default: 1.0 - disabled). Set below 1.0 to guard "
+                        "against frame-spanning false positives from noisy/low-res feeds.")
     p.add_argument("--half", dest="half", action="store_true", default=True,
                    help="Use FP16 inference (default: on). Requires CUDA.")
     p.add_argument("--no-half", dest="half", action="store_false",

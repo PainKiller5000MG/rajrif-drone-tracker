@@ -22,15 +22,33 @@ GPU (Colab Pro+), PyTorch 2.6.0+cu124.
 
 ## Detection-layer safety filters
 
-| Filter | Default | Rationale |
-|---|---|---|
-| Confidence threshold | 0.60 (2026-08-15, lowered from 0.80 at user request so borderline/distant detections aren't missed) | observed false positives measured 0.25–0.68; real detections 0.85–0.95. **Note: 0.60 sits inside the observed false-positive range (up to 0.68), unlike the old 0.80 default** — if a false lock reappears (e.g. a face), raise this back toward 0.80 |
-| Max box area fraction | 0.10 (10%) | real detections ≤2.6% of frame; false positives measured 35–60% |
-| Confirm cycles (LOCK) | 4 consecutive | ~1s before a detection is trusted enough to originate a lock |
-| Detector poll interval | 0.12s (~8Hz) | decoupled from camera/control loop |
-| IoU consistency threshold | 0.35 | tolerates real inter-frame drone motion (measured 0.0–0.94) |
-| Streak decay | soft (-1 per miss) | a single missed/inconsistent cycle doesn't erase prior progress |
-| Staleness gap | 8× poll interval (≥1.0s) | old streak reference discarded past this |
+**As of 2026-08-16, the confidence and box-size filters are effectively
+disabled by default, at explicit user request, understanding the
+tradeoff.** History: 0.80 (initial) → 0.60 (2026-08-15, still above the
+observed false-positive band) → 0.01 / 1.0 (2026-08-16, both filters
+removed). This applies everywhere: `detect_drone.py`,
+`detect_and_track.py` (both modes), `yolo_autoacquire.py` (feeds
+auto-acquire in both `tracker_gui.py` and `Old/main.py`).
+
+| Filter | Current default | Prior default | Rationale for prior value (no longer applied) |
+|---|---|---|---|
+| Confidence threshold | **0.01** (effectively unfiltered — Ultralytics refuses literal 0.0) | 0.60, originally 0.80 | observed false positives measured 0.25–0.68; real detections 0.85–0.95 |
+| Max box area fraction | **1.0** (disabled) | 0.10 (10%) | real detections ≤2.6% of frame; false positives measured 35–60% |
+| Confirm cycles (LOCK) | 4 consecutive (**unchanged**) | — | ~1s before a detection is trusted enough to originate a lock — the only remaining gate against a single noisy frame, not a confidence filter |
+| Detector poll interval | 0.12s (~8Hz, unchanged) | — | decoupled from camera/control loop |
+| IoU consistency threshold | 0.35 (unchanged) | — | tolerates real inter-frame drone motion (measured 0.0–0.94) |
+| Streak decay | soft (-1 per miss, unchanged) | — | a single missed/inconsistent cycle doesn't erase prior progress |
+| Staleness gap | 8× poll interval (≥1.0s, unchanged) | — | old streak reference discarded past this |
+
+**Practical effect**: LOCK mode's auto-acquire will now originate a lock
+on any detection YOLO returns at all — including clouds, birds, or
+background noise repeated consistently for ~1s (the confirm-cycles gate).
+Where AUTO FIRE is armed, such a lock is exactly as fire-eligible as a
+real one (see `10-fire-control-safety.md`). To restore filtering, pass
+`--conf-threshold 0.5` (or similar) and `--max-box-area-frac 0.1`
+explicitly on the command line, or raise the equivalent fields in
+`tracker_gui.py`'s Auto-acquire panel / `Old/main.py`'s
+`AUTO_ACQUIRE_CONF`/`AUTO_ACQUIRE_MAX_AREA_FRAC` constants.
 
 ## Tracking (`tracker_core.py`)
 

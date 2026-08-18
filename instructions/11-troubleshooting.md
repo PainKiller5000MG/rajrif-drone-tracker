@@ -80,7 +80,7 @@ Watch the console — with logging enabled you should see one of:
 - `Auto-acquire: candidate box WxH (X% of frame) - streak N/4` — it's
   seeing something, just hasn't hit the confirm bar yet. Normal if it's
   climbing.
-- `Auto-acquire: watching, no detection above conf 0.60 yet` — model is
+- `Auto-acquire: watching, no detection above conf 0.01 yet` (rare now that the floor is effectively disabled) — model is
   running but nothing is clearing the confidence floor. Check lighting/
   distance/whether a drone is actually in frame.
 - **Nothing at all, ever** — the detector likely never loaded. Check for
@@ -135,21 +135,28 @@ du -sh drone_detection_module/*
 
 ## A detected drone false-positives on something else (face, background)
 
-Mitigated by the confidence (`0.60`, lowered 2026-08-15 from `0.80` so
-weaker/distant real detections aren't missed) and box-area (`10%`) filters
-— validated against a real incident where a webcam face triggered at
-confidence 0.25–0.68 with a box spanning 35–60% of frame, versus real
-drone detections measured at 0.85–0.95 confidence and ≤2.6% of frame.
+**As of 2026-08-16, both the confidence and box-area filters are
+effectively disabled by default** (`conf≈0.01`, `max-box-area-frac=1.0`),
+at explicit user request. This was a real, working defense before that
+change — validated against a real incident where a webcam face triggered
+at confidence 0.25–0.68 with a box spanning 35–60% of frame, versus real
+drone detections measured at 0.85–0.95 confidence and ≤2.6% of frame —
+and removing it means that exact class of false positive (a face, or
+anything else YOLO weakly/wrongly flags) can now originate a lock, and if
+AUTO FIRE is armed, is exactly as fire-eligible as a real target.
 
-**Important:** `0.60` is *inside* that observed false-positive range
-(up to 0.68), unlike the old `0.80` default which sat above it entirely —
-lowering the threshold was a deliberate trade of false-positive margin for
-catching weaker real detections. The box-area filter (`10%`) is now the
-main defense against a face/head-sized false positive, since a face fills
-far more than 10% of frame at typical webcam distance. If a false lock
-reappears, first check whether it's clearing the box-area filter; if so,
-raise `--conf-threshold` back toward `0.80`. If you see a *new*
-false-positive pattern that slips through these filters, that's real signal
-worth capturing (see `12-technical-specs.md`'s training roadmap notes) —
-the underlying model is single-class and has no explicit "not a drone"
-signal, so this can never be fully eliminated by filtering alone.
+The only remaining defense is the LOCK-mode confirm-cycle streak
+(`--confirm-frames`, default 4, ~1s of IoU-consistent detections) — this
+catches a single noisy frame but **not** a false positive that holds
+fairly still for a second, which a stationary face or a hovering
+non-drone object both can do.
+
+**If a false lock happens**, the fix is to restore filtering explicitly:
+```
+--conf-threshold 0.6 --max-box-area-frac 0.1
+```
+(or higher/lower to taste — see `12-technical-specs.md` for the measured
+confidence/size bands that separated real detections from the known
+false-positive case). This is a deliberate, known tradeoff, not a bug —
+see `12-technical-specs.md`'s "Detection-layer safety filters" section for
+the full history.
